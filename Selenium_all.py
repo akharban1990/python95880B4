@@ -11,6 +11,7 @@ import pandas as pd
 import time
 # Import modules
 import Selenium_Nordstrom, Selenium_Macys, Selenium_GAP
+import webbrowser
 
 
 # Variables
@@ -27,7 +28,7 @@ url2 = {'Nordstrom':'&filtercategoryid=6000011',
         'Macys': '/Gender/Men',
         'GAP': '#pageId=0&department=75'}
 search_keyword_punc = {'Nordstrom': '+', 'Macys': '-', 'GAP': '-'}
-num_scroll = {'Nordstrom': 1, 'Macys': 1, 'GAP': 3}
+num_scroll = {'Nordstrom': 1, 'Macys': 1, 'GAP': 1}
 
 
 # Functions
@@ -46,7 +47,27 @@ def merge(frames):
     for frame in frames[1:]:
         df = df.concat(frame)
     return df
+def createHTML(articleName,url,image,price):
+    f = open('output.html', 'w')
+    message = """<html><head><title>Easy Clothing</title><meta charset="utf-8" /></head><body><div id="divHome">
+    <div style="background-color:aquamarine;border-style:double;border-width:4px">
+    <h1>Easy Clothing</h1>
+    </div>
+    <br />
+    <div id="divMainMenu">
 
+    <table style="width:100%;">
+    """
+    image =['https://www.readjunk.com/wp-content/uploads/2015/09/no-image-found1-900x600.png' if x is None else x for x in image]
+
+    for i in range(1,len(url)+1):
+        if i%3==1:
+            message = message + """<tr>"""
+        message = message + """<td><h3>"""+articleName[i-1]+"""</h3><br /><a href="""+url[i-1]+"""><img src="""+image[i-1]+""" height="300px"/></a><br /><label style="padding-left:75px">Price:"""+ price[i-1]+"""</label></td>"""
+        if i%3==0:
+            message = message + """</tr>"""
+    f.write(message)
+    f.close()
 
 # Main()
 def main():
@@ -58,6 +79,11 @@ def main():
         print("Searching", search_keyword_raw, "...")
 
         """Iteration Loop"""
+        listName =[]
+        listLink =[]
+        listImage=[]
+        listPrice=[]
+
         frames = []
         for module in modules:
             # Website: Nordstrom, Macys, GAP
@@ -88,7 +114,10 @@ def main():
                 products_price_website = products_price_website + products_price_scrape
                 # print("products_name_scrape:", len(products_name_scrape), products_name_scrape)
             # print(website, "products", len(products_name_website))
-
+            listImage = listImage + products_img_website
+            listName = listName + products_name_website
+            listPrice = listPrice + products_price_website
+            listLink = listLink + products_url_website
             # Quit browser
             browser.quit()
 
@@ -117,6 +146,7 @@ def main():
         csv_name = search_keyword + '.csv'
         df_merge_data.to_csv(csv_name, columns=['name', 'link', 'image', 'price'], encoding='utf-8')
         print("Search finished.")
+        createHTML(listName,listLink,listImage,listPrice)
     return
 
 
