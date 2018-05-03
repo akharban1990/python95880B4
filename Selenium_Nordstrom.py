@@ -47,7 +47,7 @@ def get_product_img(browser):
 
 
 def get_product_price(browser):
-    products = browser.find_elements_by_css_selector("article > div > p:last-child > span")
+    products = browser.find_elements_by_css_selector("article > div > p:last-child > span:last-child")
     product_price = [(product.text) for product in products]
     product_price = [price for price in product_price if (":" not in price and "%" not in price)]
     # print(product_price)

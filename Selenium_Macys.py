@@ -48,7 +48,7 @@ def get_product_img(browser):
 
 
 def get_product_price(browser):
-    products = browser.find_elements_by_css_selector('div.productDetail > div.productDescription > div.priceInfo > div.prices > div:last-child > span')
+    products = browser.find_elements_by_css_selector('div.productDetail > div.productDescription > div.priceInfo > div.prices > div:last-child > span:last-child')
     product_price = [(product.text) for product in products]
     return product_price
 

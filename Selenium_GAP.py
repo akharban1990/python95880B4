@@ -47,7 +47,7 @@ def get_product_img(browser):
 
 
 def get_product_price(browser):
-    products = browser.find_elements_by_class_name('product-card-price--strike')
+    products = browser.find_elements_by_css_selector('div.product-card--body > div.product-card--text > div > div > div > div.last-child > span:last-child')
     product_price = [(product.text) for product in products]
     return product_price
 
