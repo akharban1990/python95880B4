@@ -36,7 +36,7 @@ def get_product_name(browser):
 
 def get_product_url(browser):
     products = browser.find_elements_by_css_selector("article > a")
-    product_url = [("https://shop.nordstrom.com" + product.get_attribute('href')) for product in products]
+    product_url = [(product.get_attribute('href')) for product in products]
     return product_url
 
 
@@ -47,9 +47,9 @@ def get_product_img(browser):
 
 
 def get_product_price(browser):
-    products = browser.find_elements_by_css_selector("article > div > p:last-child > span:last-child")
+    products = browser.find_elements_by_css_selector("article > div > p:last-child > span.npr-_EO1P")
     product_price = [(product.text) for product in products]
-    product_price = [price for price in product_price if (":" not in price and "%" not in price)]
+    product_price = [price for price in product_price]
     # print(product_price)
     return product_price
 

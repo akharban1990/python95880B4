@@ -42,8 +42,8 @@ def get_product_url(browser):
 
 
 def get_product_img(browser):
-    products = browser.find_elements_by_css_selector('div.productThumbnailImage > a')
-    product_img = [(product.get_attribute('href')) for product in products]
+    products = browser.find_elements_by_css_selector('div.productThumbnailImage > a > img')
+    product_img = [(product.get_attribute('src')) for product in products]
     return product_img
 
 

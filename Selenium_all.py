@@ -12,14 +12,15 @@ import time
 # Import modules
 import Selenium_Nordstrom, Selenium_Macys, Selenium_GAP
 import webbrowser
+import requests
+import bs4
 
 
 # Variables
 """Modules"""
-modules = [Selenium_Nordstrom, Selenium_Macys, Selenium_GAP]
+modules = [Selenium_Nordstrom, Selenium_Macys]
 module_names = {Selenium_Nordstrom: 'Nordstrom',
-                Selenium_Macys: 'Macys',
-                Selenium_GAP: 'GAP'}
+                Selenium_Macys: 'Macys'}
 """URL"""
 url1 = {'Nordstrom':'https://shop.nordstrom.com/sr?keyword=',
         'Macys': 'https://www.macys.com/shop/featured/',
@@ -29,6 +30,12 @@ url2 = {'Nordstrom':'&filtercategoryid=6000011',
         'GAP': '#pageId=0&department=75'}
 search_keyword_punc = {'Nordstrom': '+', 'Macys': '-', 'GAP': '-'}
 # num_scroll = {'Nordstrom': 1, 'Macys': 1, 'GAP': 1}
+
+def makeURLASOS(searchTerm):
+    url_home = "http://us.asos.com/search/mens%20"  # add search item and ext_home_men
+    ext_home_men = "?page=1&q=mens%20"  # add search item
+    url=url_home + searchTerm+ext_home_men+searchTerm
+    return url
 
 
 # Functions
@@ -49,8 +56,33 @@ def merge(frames):
         df = df.concat(frame)
     return df
 
+def getArticles(url):
+    articleName =[]
+    linkList =[]
+    price = []
+    image=[]
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(url,headers=headers)
+    soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
-def createHTML(name, url, image, price):
+    for span in soup.find_all(name="span", attrs={"class": "_342BXW_"}):
+        price.append(span.text.strip())
+    for a in soup.find_all(name="a", attrs={"class": "_3x-5VWa"}):
+        articleName.append(a['aria-label'])
+        linkList.append(a['href'])
+    for div in soup.find_all(name="div", attrs={"class": "_1FN5N-P"}):
+        for img in div.find_all(name="img"):
+            image.append(img.get("src"))
+
+    return price,articleName,linkList,image
+
+def createHTML(name, url, image, price,link):
+    urli = makeURLASOS(link)
+    price = price+ (getArticles(urli)[0])
+    name = name + (getArticles(urli)[1])
+    url = url + (getArticles(urli)[2])
+    image = image+ (getArticles(urli)[3])
+
     f = open('output.html', 'w')
     message = """
     <html><head><title>Easy Clothing</title><meta charset="utf-8" /></head><body><div id="divHome">
@@ -148,8 +180,9 @@ def main():
             frames.append(df_website_data)
 
         """Merge Data"""
+        print("Searching Asos ...")
         print("Gathering results ...")
-        createHTML(products_name_all, products_url_all, products_img_all, products_price_all)
+        createHTML(products_name_all, products_url_all, products_img_all, products_price_all,search_keyword)
 
         df_merge_data = pd.concat(frames, ignore_index=True, axis=0)
         df_merge_data.index = range(1, len(df_merge_data)+1)

@@ -36,7 +36,7 @@ def get_product_name(browser):
 
 def get_product_url(browser):
     products = browser.find_elements_by_class_name('product-card--link')
-    product_url = [("https://www.gap.com" + product.get_attribute('href')) for product in products]
+    product_url = [(product.get_attribute('href')) for product in products]
     return product_url
 
 
@@ -60,7 +60,7 @@ def get_product_price(browser):
 
 def get_product_info(browser):
     time.sleep(0.5)
-    button = browser.find_element_by_css_selector('body > div.optly-modal > div.optly-modal-content > span > span > svg')
+    #button = browser.find_element_by_css_selector('body > div.optly-modal > div.optly-modal-content > span > span > svg')
     # button.click()
     # print("button", button, button.text)
     products_name = get_product_name(browser)
